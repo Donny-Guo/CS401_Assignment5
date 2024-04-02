@@ -6,3 +6,6 @@ Different levels of message passage over network:
 
 
 
+Questions: 
+
+1. what's the status of the message class?
