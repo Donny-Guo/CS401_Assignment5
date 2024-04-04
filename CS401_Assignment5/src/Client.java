@@ -6,17 +6,37 @@ import java.util.Scanner;
 public class Client {
 	public void go() {
 		
+		String host = "127.0.0.1";
+		int port = 5000;
+		
+		Socket sock = null;
+		ObjectInputStream reader = null;
+		ObjectOutputStream writer = null;
+		Scanner scanner = null;
+		
+//		Scanner sc = new Scanner(System.in);
+//		System.out.println("Enter the host address to connect to: <127.0.0.1>");
+//		host = sc.nextLine();
+//		System.out.println("Enter the port number to connect to: <5000>");
+//		port = sc.nextInt();
+		
+		
 		// set up socket to connect to server
-		try (Socket sock = new Socket("127.0.0.1", 5000)) {
+		try {
+			
+			sock = new Socket(host, port);
+			
+			// print socket info
+			System.out.println("Connected to " + host + ":" + port);
 			
 			// set up reader + deserializer
-			ObjectInputStream reader = new ObjectInputStream(sock.getInputStream());
+			reader = new ObjectInputStream(sock.getInputStream());
 			
 			// set up writer + serializer
-			ObjectOutputStream writer = new ObjectOutputStream(sock.getOutputStream());
+			writer = new ObjectOutputStream(sock.getOutputStream());
 			
 			// set up scanner
-			Scanner scanner = new Scanner(System.in);
+			scanner = new Scanner(System.in);
 			String line;
 			
 			// pass a login message to server
@@ -30,14 +50,20 @@ public class Client {
 			if (loginReceipt.getType() == MessageType.LOGIN 
 				&& loginReceipt.getStatus() == Status.SUCCESS) {
 				
+				System.out.println("Successfully login");
+				
+				// Prompt the user to enter message
+				System.out.println("Enter lines of text OR enter logout to log out.");
+				
 				// while loop:
 				while(true) {
 					// Prompt the user to enter message
-					System.out.println("Enter lines of text OR enter logout to log out.");
+					// System.out.println("Enter lines of text OR enter logout to log out.");
+					
 					line = scanner.nextLine();
 					
 					// if message is not logout:
-					if (!line.equals("logout")) {
+					if (!line.equalsIgnoreCase("logout")) {
 						
 						// send this text message 
 						Message textMsg = new Message(MessageType.TEXT, Status.SENT, line);
@@ -94,17 +120,25 @@ public class Client {
 			} // end if login message status is success
 			
 			
-			// close reader, writer, scanner
-			reader.close();
-			writer.close();
-			scanner.close();
-				
-			
 		} catch (Exception e) {
 			
 			e.printStackTrace();
 			
-		} // end try/catch with resource
+		} finally { // cleaning up
+			
+			try {
+				// close reader, writer, scanner
+				reader.close();
+				writer.close();
+				scanner.close();
+				sock.close();
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}// end try/catch/finally
+		 
 		
 		
 	} // end method go

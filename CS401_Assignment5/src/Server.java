@@ -13,6 +13,12 @@ public class Server {
 		// set up server socket
 		try (ServerSocket serverSock = new ServerSocket(5000)) {
 			
+			// print out server info
+			InetAddress localHost = InetAddress.getLocalHost();
+			System.out.println("Server running at IPv4 Address " + localHost.getHostAddress()
+								+ " at port " + serverSock.getLocalPort());
+			System.out.println("ServerSocket awaiting connections...");
+			
 			// while true
 			while(true) {
 				// wait for incoming connection
@@ -26,6 +32,7 @@ public class Server {
 			
 		} // end try/catch with resource
 			
+		threadPool.shutdown();
 		
 	} // end method go
 	
@@ -100,7 +107,9 @@ public class Server {
 				
 				
 			} catch (Exception e) {
+				
 				e.printStackTrace();
+				
 			} finally { // finally close sock
 				try { 
 					sock.close();
