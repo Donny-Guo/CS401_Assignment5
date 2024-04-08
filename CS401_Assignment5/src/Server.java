@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,8 +17,10 @@ public class Server {
 			
 			// print out server info
 			InetAddress localHost = InetAddress.getLocalHost();
-			System.out.println("Server running at IPv4 Address " + localHost.getHostAddress()
-								+ " at port " + serverSock.getLocalPort());
+//			System.out.println("Server running at IPv4 Address " + localHost.getHostAddress()
+//								+ " at port " + serverSock.getLocalPort());
+			System.out.println("Server running at IPv4 Address " + getIPAddress()
+			+ " at port " + serverSock.getLocalPort());
 			System.out.println("ServerSocket awaiting connections...");
 			
 			// while true
@@ -54,6 +58,9 @@ public class Server {
 				// wait for login message
 				Message login = (Message) reader.readObject();
 				
+				// print message text
+				System.out.println(login.getText());
+				
 				// check login message
 				if (login.getType() == MessageType.LOGIN 
 					&& login.getStatus() == Status.SENT) {
@@ -85,6 +92,7 @@ public class Server {
 							writer.writeObject(msg);
 							
 						} else {// else: if message is logout
+							
 							// change status to success
 							msg.setStatus(Status.SUCCESS);
 							// send it back to client
@@ -136,6 +144,27 @@ public class Server {
 		
 	} // end private class threadJob
 	
+	
+	public String getIPAddress() {
+		String output = "127.0.0.1";
+    	try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface intf : Collections.list(interfaces)) {
+
+                Enumeration<InetAddress> addresses = intf.getInetAddresses();
+                for (InetAddress addr : Collections.list(addresses)) {
+                    if (intf.getName().equals("en0") && addr.getHostAddress().indexOf(':') == -1) {
+                        System.out.println("Interface " + intf.getName() + " IP: " + addr.getHostAddress());
+                        output = addr.getHostAddress();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    	
+    	return output;
+	}
 	
 	public static void main(String[] args) {
 		Server server = new Server();

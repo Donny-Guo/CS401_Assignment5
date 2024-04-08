@@ -14,11 +14,11 @@ public class Client {
 		ObjectOutputStream writer = null;
 		Scanner scanner = null;
 		
-//		Scanner sc = new Scanner(System.in);
-//		System.out.println("Enter the host address to connect to: <127.0.0.1>");
-//		host = sc.nextLine();
-//		System.out.println("Enter the port number to connect to: <5000>");
-//		port = sc.nextInt();
+		Scanner sc = new Scanner(System.in);
+		System.out.println("Enter the host address to connect to: <127.0.0.1>");
+		host = sc.nextLine();
+		System.out.println("Enter the port number to connect to: <5000>");
+		port = sc.nextInt();
 		
 		
 		// set up socket to connect to server
@@ -40,7 +40,7 @@ public class Client {
 			String line;
 			
 			// pass a login message to server
-			Message login = new Message(MessageType.LOGIN, Status.SENT, "Client Login Request");
+			Message login = new Message(MessageType.LOGIN, Status.SENT, "Client Login Request: I want to login!");
 			writer.writeObject(login);
 			
 			// read login message from server (expecting status success)
@@ -90,7 +90,7 @@ public class Client {
 					} else { // message is logout
 		
 						// send logout message to server
-						Message logout = new Message(MessageType.LOGOUT, Status.SENT, "Client Logout Request");
+						Message logout = new Message(MessageType.LOGOUT, Status.SENT, "Client Logout Request: please log me out!");
 						writer.writeObject(logout);
 						
 						// wait for logout success receipt from server
@@ -99,7 +99,7 @@ public class Client {
 						// if success: break the while loop
 						if (logoutReceipt.getType() == MessageType.LOGOUT 
 							&& logoutReceipt.getStatus() == Status.SUCCESS) {
-							
+							System.out.println("Successfully logged out. Exiting...");
 							break;
 							
 						} else { // else: print out status
@@ -118,6 +118,10 @@ public class Client {
 				
 				
 			} // end if login message status is success
+			else {
+				System.out.println("Unable to connect to " + host + ":" + port);
+				System.out.println("Exiting...");
+			}
 			
 			
 		} catch (Exception e) {
